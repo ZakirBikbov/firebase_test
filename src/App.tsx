@@ -1,35 +1,31 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Routes, Route } from 'react-router-dom'
+import { Page } from './components/Page'
+import Layout from './components/Layout'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+export const FIREBASE = "https://homework-63-zakir-bikbov-default-rtdb.europe-west1.firebasedatabase.app/"
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+export type TPagesProps = {
+	load: React.Dispatch<React.SetStateAction<boolean>>
+	pageId: string
+}
+
+function App() {
+	const [isLoading, setIsloading] = useState(false)
+	const [pageId, setPageId] = useState('-NZ5JT-afoyIvxcP5iyY')
+
+	return (
+		<Routes>
+			<Route element={<Layout isLoad={isLoading} setPageId={setPageId} />}>
+				<Route path="/" element={<Page load={setIsloading} pageId={pageId} />} />
+				<Route path="/bio" element={<Page load={setIsloading} pageId={pageId} />} />
+				<Route path="/contact" element={<Page load={setIsloading} pageId={pageId} />} />
+				<Route path="/faq" element={<Page load={setIsloading} pageId={pageId} />} />
+				<Route path="/games" element={<Page load={setIsloading} pageId={pageId} />} />
+			</Route>
+		</Routes >
+	)
 }
 
 export default App
