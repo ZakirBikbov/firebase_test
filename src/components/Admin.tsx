@@ -1,32 +1,24 @@
 import { FC, ReactElement, useState, useEffect } from 'react'
-import { FIREBASE } from '../App'
-import { TNavList } from './Header'
-import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { FIREBASE } from '../containers/AppContainer'
+import { TNavList } from '../containers/AppContainer'
 import { EditorState, convertToRaw, convertFromRaw } from 'draft-js'
 import { Editor } from "react-draft-wysiwyg"
+import axios from 'axios'
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 
 type TAdminProps = {
-    load: React.Dispatch<React.SetStateAction<boolean>>
+    load: React.Dispatch<React.SetStateAction<boolean>>,
+    pages: TNavList
 }
 
-export const Admin: FC<TAdminProps> = ({ load }): ReactElement => {
-    const [pages, setPages] = useState<TNavList>([])
-    const [currentPageId, setCurrentPageId] = useState('-NZ5JT-afoyIvxcP5iyY')
+export const Admin: FC<TAdminProps> = ({ load, pages }): ReactElement => {
+    const [mounted, setMounted] = useState(false);
+    const [currentPageId, setCurrentPageId] = useState('home')
     const [title, setTitle] = useState('')
     const [editorState, setEditorState] = useState(() =>
         EditorState.createEmpty()
     )
-    const getPages = async () => {
-        load(true)
-        const { data } = await axios.get(`${FIREBASE}pages.json`)
-        if (data) {
-            const dataList: TNavList = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-            setPages(dataList)
-            setTitle(dataList.filter(page => page.id === currentPageId)[0].title)
-        }
-        load(false)
-    }
 
     const getContent = async () => {
         load(true)
@@ -38,28 +30,35 @@ export const Admin: FC<TAdminProps> = ({ load }): ReactElement => {
         load(false)
     }
 
+    let navigate = useNavigate()
+
     const changePage = async () => {
         load(true)
-        if (editorState) {
+        if (editorState !== null && editorState !== undefined && mounted) {
             const contentState = editorState.getCurrentContent()
             const content = JSON.stringify(convertToRaw(contentState))
             await axios.put(`${FIREBASE}content/${currentPageId}.json`, { content })
             await axios.patch(`${FIREBASE}pages/${currentPageId}.json`, { title })
         }
         load(false)
+        if (mounted) {
+            navigate(pages.filter(page => page.id === currentPageId)[0].path)
+        }
     }
 
     useEffect(() => {
-        getPages()
+        setMounted(true)
         getContent()
+        return () => {
+            setMounted(false);
+        }
     }, [])
 
     useEffect(() => {
-        if (pages.length === 0) {
-            return
+        if (pages.length !== 0) {
+            setTitle(pages.filter(page => page.id === currentPageId)[0].title)
+            getContent().then().catch(e => console.error(e))
         }
-        setTitle(pages.filter(page => page.id === currentPageId)[0].title)
-        getContent().then().catch(e => console.error(e))
     }, [currentPageId])
 
     return (
@@ -67,7 +66,15 @@ export const Admin: FC<TAdminProps> = ({ load }): ReactElement => {
             <div className="admin-panel-block">
                 <label htmlFor="">Select page</label>
                 <select onChange={e => setCurrentPageId(e.target.value)}>
-                    {pages.map(page => <option key={page.id} value={page.id}>{page.title}</option>)}
+                    {pages.length !== 0 && 
+                        <>
+                            <option value='home'>{pages.filter(p => p.id === "home")[0].title}</option>
+                            <option value='bio'>{pages.filter(p => p.id === "bio")[0].title}</option>
+                            <option value='contact'>{pages.filter(p => p.id === "contact")[0].title}</option>
+                            <option value='faq'>{pages.filter(p => p.id === "faq")[0].title}</option>
+                            <option value='games'>{pages.filter(p => p.id === "games")[0].title}</option>
+                        </>
+                    }
                 </select>
             </div>
 
@@ -90,7 +97,6 @@ export const Admin: FC<TAdminProps> = ({ load }): ReactElement => {
             <div className="admin-panel-block">
                 <button className="save-btn" onClick={changePage}>Save</button>
             </div>
-
         </>
     )
 }

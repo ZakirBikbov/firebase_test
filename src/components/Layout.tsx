@@ -2,16 +2,17 @@ import { FC, ReactElement } from 'react'
 import { Outlet } from "react-router-dom"
 import { Header } from './Header'
 import { Footer } from './Footer'
+import { TNavList } from '../containers/AppContainer'
 
 type TLayoutProps = {
     isLoad: boolean,
-    setPageId: React.Dispatch<React.SetStateAction<string>>
+    pages: TNavList
 }
 
-const Layout: FC<TLayoutProps> = ({ isLoad, setPageId }): ReactElement => {
+const Layout: FC<TLayoutProps> = ({ isLoad, pages }): ReactElement => {
     return (
         <>
-            <Header setPageId={setPageId} />
+            <Header pages={pages} />
             <main>
                 {isLoad &&
                     <div className="loading">

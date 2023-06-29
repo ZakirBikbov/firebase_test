@@ -1,6 +1,6 @@
 import { FC, ReactElement, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { FIREBASE, TPagesProps } from '../App'
+import { FIREBASE, TPagesProps } from '../containers/AppContainer'
 import draftToHtml from 'draftjs-to-html'
 import axios from 'axios'
 
@@ -9,8 +9,10 @@ export type TPage = {
     content: string
 }
 
-export const Page: FC<TPagesProps> = ({ load, pageId }): ReactElement => {
+export const Page: FC<TPagesProps> = ({ load }): ReactElement => {
     let location = useLocation()
+    let pageId = location.pathname.substring(1)
+    if(pageId === '') pageId = "home"
     const [content, setContent] = useState('')
     const [title, setTitle] = useState('')
 
