@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { FIREBASE } from '../App'
 import axios from 'axios'
 
-type TNavList = {
+export type TNavList = {
     id: string,
     title: string,
     path: string
@@ -30,6 +30,7 @@ export const Header: FC<THeaderProps> = ({ setPageId }): ReactElement => {
             <div className="container">
                 <ul className="nav-list">
                     {navlist.map(page => <li key={page.id}><NavLink onClick={()=>setPageId(page.id)} to={page.path}>{page.title}</NavLink></li>)}
+                    <li><NavLink to="/admin">Admin</NavLink></li>
                 </ul>
             </div>
         </header>

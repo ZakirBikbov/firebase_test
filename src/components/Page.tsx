@@ -1,6 +1,7 @@
 import { FC, ReactElement, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { FIREBASE, TPagesProps } from '../App'
+import draftToHtml from 'draftjs-to-html'
 import axios from 'axios'
 
 export type TPage = {
@@ -10,30 +11,37 @@ export type TPage = {
 
 export const Page: FC<TPagesProps> = ({ load, pageId }): ReactElement => {
     let location = useLocation()
-    let pathname = location.pathname.replace('/', '')
-    let title = pathname.replace(/^\w/, (c) => c.toUpperCase())
-    if(pathname === '') {
-        title = "Home"
-    }
-    const [content, setContent] = useState<string>('')
+    const [content, setContent] = useState('')
+    const [title, setTitle] = useState('')
 
     const getContent = async () => {
         load(true)
         const { data } = await axios.get(`${FIREBASE}content/${pageId}.json`)
-        if(data) {
-            setContent(data)
+        if (data) {
+            const markup = draftToHtml(JSON.parse(data.content))
+            setContent(markup)
         }
         load(false)
     };
 
+    const getTitle = async () => {
+        load(true)
+        const { data } = await axios.get(`${FIREBASE}pages/${pageId}.json`)
+        if (data) {
+            setTitle(data.title)
+        }
+        load(false)
+    }
+
     useEffect(() => {
-        getContent().then().catch(e => console.log(e))
+        getTitle()
+        getContent()
     }, [location])
 
     return (
         <>
-            <h2>{title}</h2>
-            <p>{content}</p>
+            <h1>{title}</h1>
+            <p dangerouslySetInnerHTML={{ __html: content }} />
         </>
     )
 }
