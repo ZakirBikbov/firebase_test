@@ -58,3 +58,7 @@ hr {
 	margin-top: 0;
 	margin-right: 15px;
 }
+
+label {
+	font-weight: 700;
+}

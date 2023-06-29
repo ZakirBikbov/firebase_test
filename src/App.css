@@ -80,6 +80,10 @@ footer .container {
 	margin-bottom: 20px;
 }
 
+#inputTitle {
+	padding: 5px;
+}
+
 .editorClassName {
 	padding: 20px;
 }
@@ -95,12 +99,6 @@ footer .container {
 .save-btn:hover {
 	cursor: pointer;
 	background-color: #853333;
-}
-
-@media (max-width: 760px) {
-	.game-block {
-		flex-direction: column;
-	}
 }
 
 .loading {
@@ -196,5 +194,11 @@ footer .container {
 
 	50% {
 		opacity: 0.5;
+	}
+}
+
+@media (max-width: 760px) {
+	.game-block {
+		flex-direction: column;
 	}
 }
